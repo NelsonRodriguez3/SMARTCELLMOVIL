@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useLayoutEffect } from 'react';
+import React, { useState, useEffect, useLayoutEffect, useId } from 'react';
 import { View, Text, TextInput, FlatList, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { db, auth } from '../database/firebase';
@@ -53,7 +53,7 @@ export default function Menu() {
             navigation.navigate('Ingresar');
         } else {
             // Intento de eliminar otro empleado
-            await deleteDoc(doc(db, 'users', id)); // Eliminar de Firestore únicamente
+            await deleteDoc(doc(db, 'users', id));
             alert('Empleado eliminado correctamente.');
         }
     } catch (error) {
@@ -204,12 +204,12 @@ const styles = StyleSheet.create({
   viewButton: {
     padding: 10,
     borderRadius: 5,
-    marginRight: 10,
+    marginRight: 1,
   },
   editButton: {
     padding: 10,
     borderRadius: 5,
-    marginRight: 10,
+    marginRight: 1,
   },
   deleteButton: {
     padding: 10,

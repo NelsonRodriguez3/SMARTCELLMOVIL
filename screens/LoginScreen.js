@@ -107,7 +107,7 @@ const styles = StyleSheet.create({
   buttonContainer: {
     flexDirection: 'row',
     marginTop: 30,
-    width: "60%", // Ancho más amplio y adaptable para pantallas
+    width: "90%", // Ancho más amplio y adaptable para pantallas
     justifyContent: "space-evenly", // Espacio uniforme entre botones
     alignItems: "center",
   },

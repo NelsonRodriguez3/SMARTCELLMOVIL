@@ -84,7 +84,7 @@ const styles = StyleSheet.create({
         marginTop: 30,
         justifyContent: 'space-evenly', // Mantener botones centrados
         alignItems: 'center',
-        width: '70%', // Ancho más ajustado del contenedor
+        width: '90%', // Ancho más ajustado del contenedor
     },
     button: {
         backgroundColor: '#4c669f',

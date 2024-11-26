@@ -15,6 +15,7 @@ const Registro = ({ navigation }) => {
         celular: "",
         direccion: "",
         contraseña: "",
+        repetirContraseña: "",
     });
 
     useLayoutEffect(() => {
@@ -35,9 +36,15 @@ const Registro = ({ navigation }) => {
             !state.email ||
             !state.celular ||
             !state.direccion ||
-            !state.contraseña
+            !state.contraseña ||
+            !state.repetirContraseña
         ) {
             alert("Por favor, rellena todos los campos.");
+            return;
+        }
+    
+        if (state.contraseña !== state.repetirContraseña) {
+            alert("Las contraseñas no coinciden. Por favor, inténtalo de nuevo.");
             return;
         }
     
@@ -45,10 +52,11 @@ const Registro = ({ navigation }) => {
             const auth = getAuth();
             const userCredential = await createUserWithEmailAndPassword(auth, state.email, state.contraseña);
             const user = userCredential.user;
-
+    
             await sendEmailVerification(user);
             alert('Registro exitoso. Por favor, verifica tu correo antes de iniciar sesión.');
-            // Usar setDoc para asegurar que el UID en Firestore coincida con el UID del usuario autenticado
+    
+            // Guardar datos adicionales en Firestore
             await setDoc(doc(db, "users", user.uid), {
                 uid: user.uid,
                 nombre: state.nombre,
@@ -57,7 +65,7 @@ const Registro = ({ navigation }) => {
                 celular: state.celular,
                 direccion: state.direccion,
                 dni: state.dni,
-                contraseña: state.contraseña
+                contraseña: state.contraseña,
             });
     
             navigation.navigate('Ingresar');
@@ -65,12 +73,11 @@ const Registro = ({ navigation }) => {
             if (error.code === "auth/email-already-in-use") {
                 alert("El correo ya está registrado.");
             } else {
-                alert('Hubo un problema al crear el empleado: ' + error.message);
+                alert('Hubo un problema al crear el usuario: ' + error.message);
                 console.error(error);
             }
         }
     };
-
     return (
         <View style={styles.container}>
             <Text style={styles.text}>Crear cuenta</Text>
@@ -119,6 +126,13 @@ const Registro = ({ navigation }) => {
                 onChangeText={(value) => handleChangeText("contraseña", value)}
                 secureTextEntry={true}
             />
+            <TextInput
+                placeholder="Repetir Contraseña"
+                style={styles.TextInput}
+                value={state.repetirContraseña}
+                onChangeText={(value) => handleChangeText("repetirContraseña", value)}
+                secureTextEntry={true} // Oculta el texto mientras se escribe
+            />
             <TouchableOpacity style={styles.menuButton}>
                 <ButtonGradient onPress={crearusuario} title={"Registrar"} />
                 <ButtonGradient onPress={() => navigation.navigate('Ingresar')} title={"Cancelar"} />
@@ -157,7 +171,7 @@ const styles = StyleSheet.create({
         padding: 15,
         borderRadius: 10,
         marginTop: 20,
-        width: "80%",
+        width: "100%",
         justifyContent: "space-evenly",
         alignItems: 'center',
     },

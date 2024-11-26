@@ -15,6 +15,7 @@ const CrearEmpleado = ({ navigation }) => {
         celular: "",
         direccion: "",
         contraseña: "",
+        repetirContraseña: "",
     });
 
     useLayoutEffect(() => {
@@ -35,43 +36,50 @@ const CrearEmpleado = ({ navigation }) => {
             state.email === "" || 
             state.celular === "" || 
             state.direccion === "" || 
-            state.contraseña === ""
+            state.contraseña === "" || 
+            state.repetirContraseña === ""
         ) {
             alert("Por favor, rellena todos los campos.");
-        } else {
-            try {
-                const auth = getAuth();
+            return;
+        }
     
-                // Registrar usuario en Firebase Authentication
-                const userCredential = await createUserWithEmailAndPassword(auth, state.email, state.contraseña);
-                const user = userCredential.user;
+        if (state.contraseña !== state.repetirContraseña) {
+            alert("Las contraseñas no coinciden. Por favor, inténtalo de nuevo.");
+            return;
+        }
     
-                // Enviar correo de verificación
-                await sendEmailVerification(user);
-                alert('Empleado creado con éxito. Por favor, verifica el correo antes de usar la cuenta.');
-
-                await user.reload();
+        try {
+            const auth = getAuth();
     
-                // Guardar datos adicionales en Firestore
-                await setDoc(doc(db, "users", user.uid), {
-                    uid: user.uid,
-                    nombre: state.nombre,
-                    apellido: state.apellido,
-                    email: state.email,
-                    celular: state.celular,
-                    direccion: state.direccion,
-                    dni: state.dni,
-                    contraseña: state.contraseña,
-                });
+            // Registrar usuario en Firebase Authentication
+            const userCredential = await createUserWithEmailAndPassword(auth, state.email, state.contraseña);
+            const user = userCredential.user;
     
-                navigation.navigate('Menu'); // Redirigir al menú
-            } catch (error) {
-                if (error.code === "auth/email-already-in-use") {
-                    alert("El correo ya está registrado.");
-                } else {
-                    alert('Hubo un problema al crear el empleado.' + error.message);
-                    console.error(error);
-                }
+            // Enviar correo de verificación
+            await sendEmailVerification(user);
+            alert('Empleado creado con éxito. Por favor, verifica el correo antes de usar la cuenta.');
+    
+            await user.reload();
+    
+            // Guardar datos adicionales en Firestore
+            await setDoc(doc(db, "users", user.uid), {
+                uid: user.uid,
+                nombre: state.nombre,
+                apellido: state.apellido,
+                email: state.email,
+                celular: state.celular,
+                direccion: state.direccion,
+                dni: state.dni,
+                contraseña: state.contraseña,
+            });
+    
+            navigation.navigate('Menu'); // Redirigir al menú
+        } catch (error) {
+            if (error.code === "auth/email-already-in-use") {
+                alert("El correo ya está registrado.");
+            } else {
+                alert('Hubo un problema al crear el empleado.' + error.message);
+                console.error(error);
             }
         }
     };
@@ -126,11 +134,18 @@ const CrearEmpleado = ({ navigation }) => {
                 onChangeText={(value) => handleChangeText("contraseña", value)}
                 secureTextEntry={true}
             />
+            <TextInput
+                placeholder="Repetir Contraseña"
+                style={styles.TextInput}
+                value={state.repetirContraseña}
+                onChangeText={(value) => handleChangeText("repetirContraseña", value)}
+                secureTextEntry={true} // Asegura que el texto se oculte
+            />
             
             {/* Botones */}
             <View style={styles.buttonContainer}>
                 <TouchableOpacity style={styles.menuButton} onPress={crearusuario}>
-                    <Text style={styles.buttonText}>Crear Empleado</Text>
+                    <Text style={styles.buttonText}>Crear</Text>
                 </TouchableOpacity>
                 <TouchableOpacity style={styles.menuButton} onPress={() => navigation.navigate('Menu')}>
                     <Text style={styles.buttonText}>Cancelar</Text>
@@ -168,16 +183,14 @@ const styles = StyleSheet.create({
     buttonContainer: {
         flexDirection: 'row', // Alinea los botones horizontalmente
         justifyContent: 'space-between',
-        width: "60%", // Ajusta el contenedor al ancho de la pantalla
+        width: "80%", // Ajusta el contenedor al ancho de la pantalla
         marginTop: 20,
     },
     menuButton: {
-        padding: 15,
-        borderRadius: 10,
-        width: "40%", // Cada botón ocupa el 45% del ancho del contenedor
-        justifyContent: "center",
-        alignItems: 'center',
-        backgroundColor: '#3b5998',
+        backgroundColor: '#4c669f',
+        borderRadius: 20,
+        paddingVertical: 12, // Altura reducida para mejor ajuste
+        paddingHorizontal: 30, // Espaciado horizontal
     },
     buttonText: {
         color: '#fff',
